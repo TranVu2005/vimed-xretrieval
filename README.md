@@ -79,7 +79,7 @@ The baseline returns about 30–38 documents per question at high precision (Doc
 - **Document-level embeddings beat passage-level ones.** On an independent 50-question set with graded labels, BGE-M3 on whole documents (first 512 tokens) reached nDCG@10 0.729 vs 0.696 for BGE-M3 on 256-token passages and 0.706 for BM25. On the leaderboard, ranking by document-level cosine moved Final from 0.294 to 0.321 on the old candidate pool, and to 0.375 when applied to the whole corpus.
 - **A stronger reranker plus a probability cut adds about +0.04.** From 0.382 (per-question document count taken from the earlier system) to 0.418 with Qwen3-Reranker-4B and the calibrated expected-F2 cut (metric v1).
 - **Calibration holds on average and drifts at depth.** Over all returned documents, measured precision / mean predicted probability = 0.92; for documents at cosine rank 251–300 that do not carry passages, the ratio falls to about 0.3. The model is overconfident in the tail.
-- **Simple global rules beat fitted ones.** Replacing the expected-F2 cut with a learned per-question document count lost 0.014. Fitting a recalibration on leaderboard totals predicted +0.04 and measured −0.004.
+- **Simple global rules beat fitted ones.** Replacing the expected-F2 cut with a learned per-question document count lost 0.014. A calibration refit on leaderboard aggregates predicted that returning fewer documents would raise Doc F2 by about 0.04; on the leaderboard, Doc F2 fell by 0.004.
 - **Data coverage limited results more than ranking did.** Recovering 73,000 Chinese pages that timed out from our main machine (re-crawled at 1 request/s from a separate server) added +0.017 Final. In the final-week ablations, about half of the single ranking changes moved Final by 0.003 or less.
 
 ## Reproduce
@@ -131,6 +131,7 @@ src/r2ai/          library: indexing, retrieval, reranking, output selection, pa
 src/vicrawl/       resumable async crawler and per-domain extractors
 scripts/           reproduction scripts (reproduce_*.sh), index building, scoring
 configs/           pinned output-selection configs and inputs, environment constraints
+archive/           configs of experiments not used by any submission, with outcomes
 notebooks/         Kaggle notebooks for Qwen3-Reranker-4B scoring
 deploy/s37/        rate-limited crawler for one Chinese site, run on a separate server
 tests/             pytest suite with HTML fixtures
@@ -139,7 +140,7 @@ docs/              technical report, reproduction guide, code map (Vietnamese)
 figures/           pipeline diagram
 ```
 
-Module names such as `r2ai.s36` are development-round numbers. They are kept because pinned configs and the byte-exact rebuild import them; [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) maps each module to its function.
+Pinned configs record input paths of the development machine; `R2AI_PIN_ORIGIN` maps them onto the local data root, so they are left unchanged to keep the rebuild byte-exact. Module names such as `r2ai.s36` are development-round numbers. They are kept because pinned configs and the byte-exact rebuild import them; [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) maps each module to its function.
 
 ## Tech stack
 
