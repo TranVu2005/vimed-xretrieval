@@ -19,7 +19,7 @@ Lệnh viết cho bash: Linux, hoặc Git Bash trên Windows (không dùng WSL b
 ## 1. Clone và cài đặt
 
 ```bash
-git clone https://github.com/TranVu2005/r2ai-stage3-submission r2ai-stage3
+git clone https://github.com/TranVu2005/vimed-xretrieval r2ai-stage3
 cd r2ai-stage3
 python -m venv .venv
 source .venv/bin/activate                 # Windows (Git Bash): source .venv/Scripts/activate

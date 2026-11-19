@@ -7,7 +7,7 @@ REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 PY="${PY:-.venv/Scripts/python.exe}"
 export PYTHONPATH="$REPO/src" PYTHONUNBUFFERED=1
 ROOT="out/runs/s36-fuse4/extra"
-SNAP="data/hf_model_cache/models--Qwen--Qwen3-Reranker-0.6B/snapshots/e61197ed45024b0ed8a2d74b80b4d909f1255473"
+SNAP="${R2AI_QWEN06B_SNAPSHOT:-data/hf_model_cache/models--Qwen--Qwen3-Reranker-0.6B/snapshots/e61197ed45024b0ed8a2d74b80b4d909f1255473}"   # override with a local model snapshot
 LOG="$ROOT/cmax-score.log"
 ARGS=(--pool "$ROOT/cmax" --out "$ROOT/cmax-gpu" --model qwen3-reranker-0.6b --model-path "$SNAP" --subset all --part-pairs 2000)
 futile=0
