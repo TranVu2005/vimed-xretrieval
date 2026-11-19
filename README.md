@@ -28,6 +28,13 @@ Cross-lingual medical document retrieval: a Vietnamese question goes in; relevan
 
 ## Architecture
 
+![System architecture: offline indexing, data and index stores, per-question retrieval, reranking and output selection](figures/architecture.png)
+
+*Diagram labels are in Vietnamese (from the Demo Day slides). Top: offline indexing (URL list → text collection → extraction and cleaning → 256-token passages → BGE-M3 encoder). Middle: stored corpus, passages, vectors and reranker scores. Bottom: per-question flow (1) question, (2) BGE-M3, (3) dense retrieval, (4) reranking with RRF, (5) output selection.*
+
+<details>
+<summary>Text version of the diagram</summary>
+
 ```mermaid
 flowchart LR
     subgraph Offline["Offline: build index (once)"]
@@ -49,13 +56,15 @@ flowchart LR
     S --> RR
 ```
 
+</details>
+
 1. **Dense retrieval.** BGE-M3 embeds each document once (title + body, first 512 tokens) and each question at query time. The top-N documents by cosine form the candidate pool (N = 300 in the final configuration).
 2. **Reranking.** Each (question, document) pair is scored by Qwen3-Reranker-4B on the first 512 tokens, and by **C-max**: Qwen3-Reranker-0.6B on the three 256-token passages closest to the question, keeping the maximum. C-max finds answers deep in long documents. One configuration adds Jina Reranker v3.5. Rankings are merged with Reciprocal Rank Fusion (k = 60) together with the cosine ranking.
 3. **Output size by expected F2.** The 4B score is calibrated to a probability, p = σ(a · logit + b). Walking down the fused ranking, the system returns the k documents that maximize the expected F2, 5 · Σ p_i / (4 · G_q + k), where G_q is the expected number of relevant documents for that question. All constants are global and fixed in config files.
 4. **Passage-carrying documents.** Only the top part of each returned list carries passages, so passage precision does not fall with document count.
 5. **Passages.** The verbatim document body; if the body is longer than 1,536 tokens, a 768-token window around the best 256-token passage is added. A validator checks every passage is an exact substring of its document before packaging.
 
-No model is fine-tuned and no generative LLM is used: every returned passage is an exact substring of a source document. A detailed diagram (in Vietnamese) is in [`figures/pipeline.png`](figures/pipeline.png).
+No model is fine-tuned and no generative LLM is used: every returned passage is an exact substring of a source document.
 
 ## Results
 
@@ -137,7 +146,7 @@ deploy/s37/        rate-limited crawler for one Chinese site, run on a separate 
 tests/             pytest suite with HTML fixtures
 tools/             data packaging, PDF export
 docs/              technical report, reproduction guide, code map (Vietnamese)
-figures/           pipeline diagram
+figures/           architecture diagram (Demo Day slides) and detailed pipeline diagram
 ```
 
 Pinned configs record input paths of the development machine; `R2AI_PIN_ORIGIN` maps them onto the local data root, so they are left unchanged to keep the rebuild byte-exact. Module names such as `r2ai.s36` are development-round numbers. They are kept because pinned configs and the byte-exact rebuild import them; [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) maps each module to its function.
