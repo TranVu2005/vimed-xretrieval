@@ -94,7 +94,7 @@ Building the submission files from saved reranker scores needs only a CPU.
 
 ```bash
 # 1. Install (Python 3.11–3.13, tested on 3.12)
-git clone https://github.com/TranVu2005/r2ai-stage3-submission vimed-xretrieval && cd vimed-xretrieval
+git clone https://github.com/TranVu2005/vimed-xretrieval vimed-xretrieval && cd vimed-xretrieval
 python -m venv .venv && source .venv/bin/activate
 python -m pip install -e ".[reproduce,dev]" -c configs/environment.constraints.txt \
     --extra-index-url https://download.pytorch.org/whl/cu128
